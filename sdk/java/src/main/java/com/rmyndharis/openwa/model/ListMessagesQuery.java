@@ -2,7 +2,11 @@ package com.rmyndharis.openwa.model;
 
 /** Query parameters for {@code GET /sessions/:id/messages}. Null fields are omitted. */
 public record ListMessagesQuery(
-        String chatId, String from, Integer limit, Integer offset, String after, Boolean inlineMedia) {
+        String chatId, String from, Integer limit, Integer offset, String after, Boolean inlineMedia,
+        Double since, Double until, String direction, String orderBy, String type) {
+    public ListMessagesQuery(String chatId, String from, Integer limit, Integer offset, String after, Boolean inlineMedia) {
+        this(chatId, from, limit, offset, after, inlineMedia, null, null, null, null, null);
+    }
     public static Builder builder() {
         return new Builder();
     }
@@ -14,6 +18,19 @@ public record ListMessagesQuery(
         private Integer offset;
         private String after;
         private Boolean inlineMedia;
+        private Double since;
+        private Double until;
+        private String direction;
+        private String orderBy;
+        private String type;
+        public Builder type(String v) { this.type = v; return this; }
+
+        /** Inclusive message-time lower bound, Unix epoch milliseconds. */
+        public Builder since(Double v) { this.since = v; return this; }
+        /** Exclusive message-time upper bound, Unix epoch milliseconds. */
+        public Builder until(Double v) { this.until = v; return this; }
+        public Builder direction(String v) { this.direction = v; return this; }
+        public Builder orderBy(String v) { this.orderBy = v; return this; }
 
         public Builder chatId(String v) {
             this.chatId = v;
@@ -48,7 +65,7 @@ public record ListMessagesQuery(
         }
 
         public ListMessagesQuery build() {
-            return new ListMessagesQuery(chatId, from, limit, offset, after, inlineMedia);
+            return new ListMessagesQuery(chatId, from, limit, offset, after, inlineMedia, since, until, direction, orderBy, type);
         }
     }
 }
