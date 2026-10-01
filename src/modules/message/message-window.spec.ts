@@ -70,6 +70,35 @@ describe('message-time selection', () => {
     expect(() => parseMessageWindow({ messageId: '' })).toThrow();
   });
 
+  it('excludes imported stories before paging, totals and unknown-time gaps without deleting them', async () => {
+    const repo = ds.getRepository(Message);
+    await repo.save(
+      Array.from({ length: 40 }, (_, i) => ({
+        sessionId: 's1',
+        chatId: 'status@broadcast',
+        from: 'status@broadcast',
+        to: 'me',
+        waMessageId: `story${i}`,
+        timestamp: i ? 1059 : undefined,
+        body: 'story',
+      })),
+    );
+    let after: string | undefined;
+    const ids: string[] = [];
+    do {
+      const page = await service.getMessages('s1', { orderBy: 'timestamp', limit: 31, after });
+      expect(page.total).toBe(240);
+      expect(page.unknownTimestampTotal).toBe(1);
+      expect(page.messages.every(m => m.chatId !== 'status@broadcast')).toBe(true);
+      ids.push(...page.messages.map(m => m.id));
+      if (page.messages.length < 31) break;
+      after = page.messages.at(-1)!.id;
+    } while (ids.length < 300);
+    expect(new Set(ids).size).toBe(240);
+    expect(await repo.countBy({ chatId: 'status@broadcast' })).toBe(40);
+    expect((await service.getMessages('s1', { messageId: 'story1' })).total).toBe(0);
+  });
+
   it('uses message time, inclusive since and exclusive until, without flooring milliseconds', async () => {
     const selected = await service.getMessages('s1', {
       since: 1000_001,

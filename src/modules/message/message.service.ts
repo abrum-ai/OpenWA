@@ -330,6 +330,9 @@ export class MessageService implements PluginMessagePort {
     const query = this.messageRepository
       .createQueryBuilder('message')
       .where('message.sessionId = :sessionId', { sessionId })
+      // Stories belong to the status store. Legacy imports can still contain
+      // their rows here; exclude them before totals, time gaps and pagination.
+      .andWhere('message.chatId <> :statusBroadcast', { statusBroadcast: 'status@broadcast' })
       .orderBy(createdAtKey, 'DESC')
       // `createdAt` is not unique: SQLite stores whole seconds, Postgres NOW() is transaction-scoped
       // so a bulk write ties every row, and a history backfill stamps WhatsApp's own second-resolution
