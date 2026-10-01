@@ -479,7 +479,7 @@ ListMessagesQuery = TypedDict(
     # ``after`` is a keyset cursor: the id of the last message of the previous page.
     {"chatId": Jid, "from": Jid, "limit": int, "offset": int, "after": str, "inlineMedia": bool,
      "since": float, "until": float, "direction": Literal["incoming", "outgoing"],
-     "orderBy": Literal["createdAt", "timestamp"], "type": str},
+     "orderBy": Literal["createdAt", "timestamp"], "type": str, "messageId": str},
     total=False,
 )
 

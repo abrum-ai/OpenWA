@@ -80,6 +80,11 @@ export class MessageController {
 
   // Fenced on the optional ?chatId=: the guard checks it when present, and requireChat refuses a
   // chat-restricted key that omits it, so such a key reads only its own chats' stored history.
+  @ApiQuery({
+    name: 'messageId',
+    required: false,
+    description: 'Exact WhatsApp message reference; remains scoped to the session and chat.',
+  })
   @ChatScoped('fenced')
   @Get()
   @ApiOperation({ summary: 'Get message history for a session' })
@@ -171,10 +176,11 @@ export class MessageController {
     @Query('direction') direction?: string,
     @Query('orderBy') orderBy?: string,
     @Query('type') type?: string,
+    @Query('messageId') messageId?: string,
   ) {
     this.chatScope.requireChat(apiKey, chatId);
     return this.messageService.getMessages(sessionId, {
-      ...parseMessageWindow({ since, until, direction, orderBy, type }),
+      ...parseMessageWindow({ since, until, direction, orderBy, type, messageId }),
       chatId,
       from,
       limit: limit ? parseInt(limit, 10) : undefined,

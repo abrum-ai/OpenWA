@@ -3,9 +3,9 @@ package com.rmyndharis.openwa.model;
 /** Query parameters for {@code GET /sessions/:id/messages}. Null fields are omitted. */
 public record ListMessagesQuery(
         String chatId, String from, Integer limit, Integer offset, String after, Boolean inlineMedia,
-        Double since, Double until, String direction, String orderBy, String type) {
+        Double since, Double until, String direction, String orderBy, String type, String messageId) {
     public ListMessagesQuery(String chatId, String from, Integer limit, Integer offset, String after, Boolean inlineMedia) {
-        this(chatId, from, limit, offset, after, inlineMedia, null, null, null, null, null);
+        this(chatId, from, limit, offset, after, inlineMedia, null, null, null, null, null, null);
     }
     public static Builder builder() {
         return new Builder();
@@ -23,6 +23,8 @@ public record ListMessagesQuery(
         private String direction;
         private String orderBy;
         private String type;
+        private String messageId;
+        public Builder messageId(String v) { this.messageId = v; return this; }
         public Builder type(String v) { this.type = v; return this; }
 
         /** Inclusive message-time lower bound, Unix epoch milliseconds. */
@@ -65,7 +67,7 @@ public record ListMessagesQuery(
         }
 
         public ListMessagesQuery build() {
-            return new ListMessagesQuery(chatId, from, limit, offset, after, inlineMedia, since, until, direction, orderBy, type);
+            return new ListMessagesQuery(chatId, from, limit, offset, after, inlineMedia, since, until, direction, orderBy, type, messageId);
         }
     }
 }

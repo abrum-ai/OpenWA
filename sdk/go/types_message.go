@@ -175,15 +175,16 @@ type EditMessageRequest struct {
 // ListMessagesQuery filters GET /sessions/:id/messages.
 type ListMessagesQuery struct {
 	// Inclusive lower/exclusive upper message-time bounds, Unix epoch milliseconds.
-	Since *float64
-	Until *float64
+	Since     *float64
+	Until     *float64
 	Direction *string
-	OrderBy *string
-	Type *string
-	ChatID *string
-	From   *string
-	Limit  *int
-	Offset *int
+	MessageID *string
+	OrderBy   *string
+	Type      *string
+	ChatID    *string
+	From      *string
+	Limit     *int
+	Offset    *int
 	// After is a keyset cursor: the id of the last message of the previous page. Takes
 	// precedence over Offset.
 	After *string
@@ -202,6 +203,7 @@ func (q *ListMessagesQuery) values() url.Values {
 	}
 	setStr(v, "direction", q.Direction)
 	setStr(v, "orderBy", q.OrderBy)
+	setStr(v, "messageId", q.MessageID)
 	setStr(v, "type", q.Type)
 	setStr(v, "chatId", q.ChatID)
 	setStr(v, "from", q.From)
@@ -261,9 +263,9 @@ type MessageRecord struct {
 
 // MessageListResponse is the paginated message list payload.
 type MessageListResponse struct {
-	UnknownTimestampTotal *int `json:"unknownTimestampTotal,omitempty"`
-	Messages []MessageRecord `json:"messages"`
-	Total    int             `json:"total"`
+	UnknownTimestampTotal *int            `json:"unknownTimestampTotal,omitempty"`
+	Messages              []MessageRecord `json:"messages"`
+	Total                 int             `json:"total"`
 }
 
 // ChatHistoryMedia is the media block on a live history message.

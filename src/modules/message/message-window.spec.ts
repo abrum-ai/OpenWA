@@ -61,6 +61,15 @@ describe('message-time selection', () => {
     await ds.destroy();
   });
 
+  it('reads one exact reference without widening its session or chat', async () => {
+    const selected = await service.getMessages('s1', { chatId: '100@g.us', messageId: 'm42', inlineMedia: false });
+    expect(selected.total).toBe(1);
+    expect(selected.messages[0].body).toBe('m42');
+    expect((await service.getMessages('s2', { messageId: 'm42' })).total).toBe(0);
+    expect((await service.getMessages('s1', { chatId: '200@g.us', messageId: 'm42' })).total).toBe(0);
+    expect(() => parseMessageWindow({ messageId: '' })).toThrow();
+  });
+
   it('uses message time, inclusive since and exclusive until, without flooring milliseconds', async () => {
     const selected = await service.getMessages('s1', {
       since: 1000_001,

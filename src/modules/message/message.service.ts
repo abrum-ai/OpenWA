@@ -371,6 +371,9 @@ export class MessageService implements PluginMessagePort {
       });
     }
 
+    if (options.messageId !== undefined) {
+      query.andWhere('message.waMessageId = :messageId', { messageId: options.messageId });
+    }
     const hasTimeSelection = messageTimeOrder || options.since !== undefined || options.until !== undefined;
     // Unknown times cannot belong to a verified time window. Count the gap within the same
     // session/chat/sender/direction, before applying time bounds, without loading message bodies.

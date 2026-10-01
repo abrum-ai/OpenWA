@@ -4132,6 +4132,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "messageId",
+            "required": false,
+            "in": "query",
+            "description": "Exact WhatsApp message reference; remains scoped to the session and chat.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

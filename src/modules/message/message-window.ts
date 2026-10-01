@@ -9,6 +9,8 @@ export interface MessageWindow {
   direction?: MessageDirection;
   /** Exact stored message type (e.g. text, image or voice), no full-text search required. */
   type?: string;
+  /** Exact WhatsApp message reference, scoped to the same session/chat. */
+  messageId?: string;
   /** Existing ingestion-time order remains the default. Both orders are newest first. */
   orderBy?: 'createdAt' | 'timestamp';
 }
@@ -29,6 +31,16 @@ export function validateMessageWindow(window: MessageWindow): void {
   if (window.type !== undefined && (typeof window.type !== 'string' || !/^[a-z][a-z0-9_]{0,49}$/.test(window.type))) {
     throw new BadRequestException('type must be a non-empty message type token');
   }
+  if (
+    window.messageId !== undefined &&
+    (typeof window.messageId !== 'string' ||
+      !window.messageId.length ||
+      window.messageId.length > 200 ||
+      /\s/.test(window.messageId) ||
+      [...window.messageId].some(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127))
+  ) {
+    throw new BadRequestException('messageId must be a non-empty WhatsApp message reference up to 200 characters');
+  }
   if (window.orderBy !== undefined && !['createdAt', 'timestamp'].includes(window.orderBy)) {
     throw new BadRequestException('orderBy must be createdAt or timestamp');
   }
@@ -39,6 +51,8 @@ export function parseMessageWindow(query: {
   until?: string;
   direction?: string;
   type?: string;
+  /** Exact WhatsApp message reference, scoped to the same session/chat. */
+  messageId?: string;
   orderBy?: string;
 }): MessageWindow {
   const milliseconds = (key: 'since' | 'until'): number | undefined => {
@@ -54,6 +68,7 @@ export function parseMessageWindow(query: {
     until: milliseconds('until'),
     direction: query.direction as MessageDirection | undefined,
     type: query.type,
+    messageId: query.messageId,
     orderBy: query.orderBy as MessageWindow['orderBy'],
   };
   validateMessageWindow(window);

@@ -490,6 +490,8 @@ export interface ListMessagesQuery {
   direction?: MessageDirection;
   /** Newest first; timestamp excludes rows without known message time. Default createdAt. */
   orderBy?: 'createdAt' | 'timestamp';
+  /** Exact WhatsApp message reference within the selection. */
+  messageId?: string;
   chatId?: Jid;
   from?: Jid;
   limit?: number;
