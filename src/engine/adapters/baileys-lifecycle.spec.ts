@@ -33,6 +33,9 @@ describe('BaileysLifecycle.connect', () => {
 });
 
 describe('BaileysLifecycle QR refresh', () => {
+  // Exercise the promise overload used by the adapter, rather than qrcode's
+  // callback overload (whose return type is void).
+  const renderQr = jest.mocked(qrcode.toDataURL as (qr: string) => Promise<string>);
   type Renderer = {
     handleQrCode: (qr: string) => Promise<void>;
     qrCode: string | null;
@@ -60,8 +63,7 @@ describe('BaileysLifecycle QR refresh', () => {
   it('clears a retired image immediately and ignores a slow older render', async () => {
     const { renderer, onQRCode } = fixture();
     let finishOld!: (image: string) => void, finishNew!: (image: string) => void;
-    jest
-      .mocked(qrcode.toDataURL)
+    renderQr
       .mockImplementationOnce(
         () =>
           new Promise<string>(resolve => {
@@ -89,7 +91,7 @@ describe('BaileysLifecycle QR refresh', () => {
   it('does not publish a pending render after linking has been accepted', async () => {
     const { renderer, onQRCode } = fixture();
     let finish!: (image: string) => void;
-    jest.mocked(qrcode.toDataURL).mockImplementationOnce(
+    renderQr.mockImplementationOnce(
       () =>
         new Promise<string>(resolve => {
           finish = resolve;
